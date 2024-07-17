@@ -14,8 +14,12 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>food-ordering-system</name>
     <description>food-ordering-system</description>
+    <modules>
+        <module>order-service</module>
+        <module>order-service/order-domain/order-application-service</module>
+    </modules>
 
-<!--    기본값은 Jar 이고 pom 으로 패키징을 변경해야함. -->
+    <!--    기본값은 Jar 이고 pom 으로 패키징을 변경해야함. -->
     <packaging>pom</packaging>
 
     <properties>
@@ -26,6 +30,7 @@
     <dependencyManagement></dependencyManagement>
 
 
+<!--    컴파일 할 파일은 다 여기 버전에서 17로 설정됨-->
     <build>
         <plugins>
             <plugin>
