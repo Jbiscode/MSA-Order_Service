@@ -7,7 +7,6 @@
         <groupId>com.food.ordering.system</groupId>
         <artifactId>food-ordering-system</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>order-application-service</artifactId>
@@ -15,5 +14,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+<!--    의존성의 버전은 food-ordering-system 밑에있는 pom.xml dependencyManagement 에 설정 추가 해놓음 -->
+
+    <dependencies>
+        <dependency>
+            <groupId>com.food.ordering.system</groupId>
+            <artifactId>order-domain-core</artifactId>
+<!--            버전을 명시안하면 undefined 오류가 발생(꼭 명시 해야함)-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+        </dependency>
+    </dependencies>
 
 </project>
