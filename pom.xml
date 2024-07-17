@@ -17,6 +17,7 @@
     <modules>
         <module>order-service</module>
         <module>order-service/order-domain/order-application-service</module>
+        <module>common</module>
     </modules>
 
     <!--    기본값은 Jar 이고 pom 으로 패키징을 변경해야함. -->
@@ -55,6 +56,13 @@
             <dependency>
                 <groupId>com.food.ordering.system</groupId>
                 <artifactId>order-messaging</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+<!--            common-domain 모듈 의존성 추가 -->
+            <dependency>
+                <groupId>com.food.ordering.system</groupId>
+                <artifactId>common-domain</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
