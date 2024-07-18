@@ -93,6 +93,45 @@ public class Order extends AggregateRoot<OrderId> {
         }
     }
 
+    public void pay() {
+        if (orderStatus != OrderStatus.PENDING) {
+            throw new OrderDomainException("주문 상태가 PENDING이 아닙니다.");
+        }
+        orderStatus = OrderStatus.PAID;
+    }
+
+    public void approved() {
+        if (orderStatus != OrderStatus.PAID) {
+            throw new OrderDomainException("주문 상태가 PAID가 아닙니다.");
+        }
+        orderStatus = OrderStatus.APPROVED;
+    }
+
+    public void initCancel(List<String> failureMessages) {
+        if (orderStatus != OrderStatus.PAID) {
+            throw new OrderDomainException("주문 상태가 initCancel 을 시도 할 수 없는 상태입니다.");
+        }
+        orderStatus = OrderStatus.CANCELLING;
+        updateFailureMessages(failureMessages);
+    }
+
+    public void cancel(List<String> failureMessages) {
+        if (!(orderStatus == OrderStatus.CANCELLING || orderStatus == OrderStatus.PENDING)) {
+            throw new OrderDomainException("주문 상태가 cancel 을 시도 할 수 없는 상태입니다.");
+        }
+        orderStatus = OrderStatus.CANCELLED;
+        updateFailureMessages(failureMessages);
+    }
+
+    private void updateFailureMessages(List<String> failureMessages) {
+        if(this.failureMessages != null && failureMessages != null){
+            this.failureMessages.addAll(failureMessages.stream().filter(m -> !m.isEmpty()).toList());
+        }
+        if(this.failureMessages == null){
+            this.failureMessages = failureMessages;
+        }
+    }
+
 
     public static final class Builder {
         private OrderId orderId;
