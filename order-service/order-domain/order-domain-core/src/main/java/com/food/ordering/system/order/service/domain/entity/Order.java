@@ -6,11 +6,14 @@ import com.food.ordering.system.domain.valueobject.Money;
 import com.food.ordering.system.domain.valueobject.OrderId;
 import com.food.ordering.system.domain.valueobject.OrderStatus;
 import com.food.ordering.system.domain.valueobject.RestaurantId;
+import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
+import com.food.ordering.system.order.service.domain.valueobject.OrderItemId;
 import com.food.ordering.system.order.service.domain.valueobject.StreetAddress;
 import com.food.ordering.system.order.service.domain.valueobject.TrackingId;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class Order extends AggregateRoot<OrderId> {
@@ -34,6 +37,60 @@ public class Order extends AggregateRoot<OrderId> {
         trackingId = builder.trackingId;
         orderStatus = builder.orderStatus;
         failureMessages = builder.failureMessages;
+    }
+
+    public void initializeOrder() {
+        setId(new OrderId(UUID.randomUUID()));
+        trackingId = new TrackingId(UUID.randomUUID());
+        orderStatus = OrderStatus.PENDING;
+        initializeOrderItems();
+    }
+
+    /**
+     * Initialize order items with order id and order item id
+     */
+    private void initializeOrderItems() {
+        long itemId = 1;
+        for (OrderItem orderItem : items) {
+            orderItem.initializeOrderItem(super.getId(), new OrderItemId(itemId++));
+        }
+    }
+
+    public void validateOrder() {
+        validateInitialOrder();
+        validateTotalPrice();
+        validateItemsPrice();
+    }
+
+    private void validateItemsPrice() {
+        Money orderItemsTotal = items.stream().map(orderItem -> {
+            validateItemPrice(orderItem);
+            return orderItem.getSubTotal();
+        }).reduce(Money.ZERO, Money::add);
+
+        if (!price.equals(orderItemsTotal)) {
+            throw new OrderDomainException("종합 가격: " + price.getAmount() +
+                    " 과 아이템 가격: " + orderItemsTotal.getAmount() + " 가 일치하지 않습니다.");
+        }
+    }
+
+    private void validateItemPrice(OrderItem orderItem) {
+        if(!orderItem.isPriceValid()){
+            throw new OrderDomainException("주문 상품 가격: "+ orderItem.getPrice().getAmount() +
+                    " 과 상품: "+ orderItem.getProduct().getId().getValue() + " 가 일치하지 않습니다.");
+        }
+    }
+
+    private void validateTotalPrice() {
+        if (price == null || !price.isGreaterThanZero()) {
+            throw new OrderDomainException("주문 가격은 0원보다 커야 합니다.");
+        }
+    }
+
+    private void validateInitialOrder() {
+        if (orderStatus != null || getId() != null) {
+            throw new OrderDomainException("주문을 초기화 할 수 없는 상태입니다.");
+        }
     }
 
 

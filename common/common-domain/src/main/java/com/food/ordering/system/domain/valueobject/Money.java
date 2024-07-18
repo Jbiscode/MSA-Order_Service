@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 @EqualsAndHashCode
 public class Money  {
     private final BigDecimal amount;
+    public static final Money ZERO = new Money(BigDecimal.ZERO);
 
 //    compareTo를 사용해야 BigDecimal 값의 소숫점까지 정확히 비교 가능
     public boolean isGreaterThanZero() {

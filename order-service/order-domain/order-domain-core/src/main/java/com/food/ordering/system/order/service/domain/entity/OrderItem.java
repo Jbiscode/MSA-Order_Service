@@ -22,7 +22,25 @@ public class OrderItem extends BaseEntity<OrderItemId> {
         subTotal = builder.subTotal;
     }
 
-// 코어 로직같은 경우는 lombok 을 사용하지 않고 직접 구현하는 것이 좋다.
+    /**
+     * 주문 상품 초기화
+     * - 같은 패키지 내에서만 호출 가능해서 public 을 지우고 default 로 변경
+     * @param orderId 주문 ID
+     * @param orderItemId 주문 상품 ID
+     * @apiNote  Order 에서 OrderItem 을 생성할 때 OrderId 와 OrderItemId 를 초기화
+     */
+    void initializeOrderItem(OrderId orderId, OrderItemId orderItemId){
+        this.orderId = orderId;
+        super.setId(orderItemId);
+    }
+
+    boolean isPriceValid(){
+        return price.isGreaterThan(Money.ZERO) &&
+                price.equals(product.getPrice()) &&
+                price.multiply(quantity).equals(subTotal);
+    }
+
+    // 코어 로직같은 경우는 lombok 을 사용하지 않고 직접 구현하는 것이 좋다.
     public static final class Builder {
         private OrderItemId orderItemId;
         private Product product;
