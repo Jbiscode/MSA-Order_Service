@@ -22,6 +22,10 @@ public class OrderItem extends BaseEntity<OrderItemId> {
         subTotal = builder.subTotal;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     /**
      * 주문 상품 초기화
      * - 같은 패키지 내에서만 호출 가능해서 public 을 지우고 default 로 변경
@@ -49,10 +53,6 @@ public class OrderItem extends BaseEntity<OrderItemId> {
         private Money subTotal;
 
         private Builder() {
-        }
-
-        public static Builder builder() {
-            return new Builder();
         }
 
         public Builder orderItemId(OrderItemId val) {
