@@ -16,6 +16,11 @@ public class Product extends BaseEntity<ProductId> {
         this.price = price;
     }
 
+    // ProductId 만으로 생성하는 생성자
+    public Product(ProductId productId) {
+        super.setId(productId);
+    }
+
     public void updateWithConfirmedNameAndPrice(String name, Money price) {
         this.name = name;
         this.price = price;
