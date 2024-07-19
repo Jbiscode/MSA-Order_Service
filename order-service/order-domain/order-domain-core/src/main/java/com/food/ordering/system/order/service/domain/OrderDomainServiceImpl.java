@@ -15,11 +15,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 주문 도메인 서비스의 구현체입니다.
+ * 주문 생성, 결제, 승인 및 취소와 같은 주문 관련 비즈니스 로직을 처리합니다.
+ */
 @Slf4j
 public class OrderDomainServiceImpl implements OrderDomainService{
 
     private static final String UTC = "UTC";
 
+    /**
+     * 주문과 레스토랑 정보를 검증하고 주문을 초기화합니다.
+     *
+     * @param order 주문 엔티티입니다.
+     * @param restaurant 레스토랑 엔티티입니다.
+     * @return 주문 생성 이벤트를 반환합니다.
+     * @throws OrderDomainException 레스토랑이 비활성화 상태일 경우 예외를 발생시킵니다.
+     */
     @Override
     public OrderCreatedEvent validateAndInitiateOrder(Order order, Restaurant restaurant) {
         validateRestaurant(restaurant);
@@ -31,6 +43,12 @@ public class OrderDomainServiceImpl implements OrderDomainService{
         return new OrderCreatedEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
     }
 
+    /**
+     * 주문 항목에 해당하는 레스토랑의 제품 정보를 설정합니다.
+     *
+     * @param order 주문 엔티티입니다.
+     * @param restaurant 레스토랑 엔티티입니다.
+     */
     private void setOrderProductInformation(Order order, Restaurant restaurant) {
         // 시간복잡도 n * m (n: 주문 항목 수, m: 레스토랑 제품 수)
 //        order.getItems().forEach(orderItem-> restaurant.getProducts().forEach(restaurantProduct -> {
@@ -65,12 +83,25 @@ public class OrderDomainServiceImpl implements OrderDomainService{
         });
     }
 
+    /**
+     * 레스토랑이 주문을 받을 수 있는 상태인지 검증합니다.
+     *
+     * @param restaurant 레스토랑 엔티티입니다.
+     * @throws OrderDomainException 레스토랑이 비활성화 상태일 경우 예외를 발생시킵니다.
+     */
     private void validateRestaurant(Restaurant restaurant) {
         if(!restaurant.isActive()){
             throw new OrderDomainException("레스토랑: " + restaurant.getId().getValue() + "는 현재 주문을 받지 않습니다.");
         }
     }
 
+    /**
+     * 주문을 결제 처리합니다.
+     *
+     * @param order 주문 엔티티입니다.
+     * @param restaurant 레스토랑 엔티티입니다.
+     * @return 주문 결제 이벤트를 반환합니다.
+     */
     @Override
     public OrderPaidEvent payOrder(Order order, Restaurant restaurant) {
         order.pay();
@@ -78,12 +109,24 @@ public class OrderDomainServiceImpl implements OrderDomainService{
         return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
     }
 
+    /**
+     * 주문을 승인합니다.
+     *
+     * @param order 주문 엔티티
+     */
     @Override
     public void approveOrder(Order order) {
         order.approved();
         log.info("Order id: {} approved successfully", order.getId().getValue());
     }
 
+    /**
+     * 주문 결제를 취소합니다.
+     *
+     * @param order 주문 엔티티
+     * @param failureMessages 실패 메시지 목록
+     * @return 주문 결제 취소 이벤트
+     */
     @Override
     public OrderCancelledEvent cancelOrderPayment(Order order, List<String> failureMessages) {
         order.initCancel(failureMessages);
@@ -91,6 +134,12 @@ public class OrderDomainServiceImpl implements OrderDomainService{
         return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
     }
 
+    /**
+     * 주문을 취소합니다.
+     *
+     * @param order 주문 엔티티
+     * @param failureMessages 실패 메시지 목록
+     */
     @Override
     public void cancelOrder(Order order, List<String> failureMessages) {
         order.cancel(failureMessages);

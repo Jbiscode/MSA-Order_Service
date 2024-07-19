@@ -19,6 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * 주문 생성 과정을 담당하는 핸들러 클래스입니다.
+ * 주문 생성 요청을 받아 도메인 로직을 실행하고, 결과를 반환합니다.
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -34,6 +38,13 @@ public class OrderCreateCommandHandler {
 
     private final OrderDataMapper orderDataMapper;
 
+    /**
+     * 주문 생성 요청을 처리하고 주문 생성 결과를 반환합니다.
+     *
+     * @param createOrderCommand 주문 생성에 필요한 정보를 담고 있는 커맨드 객체입니다.
+     * @return 생성된 주문의 응답 객체입니다.
+     * @throws OrderDomainException 고객이나 식당 정보를 찾을 수 없는 경우 예외를 발생시킵니다.
+     */
     @Transactional
     public CreateOrderResponse createOrder(CreateOrderCommand createOrderCommand) {
         checkCustomer(createOrderCommand.getCustomerId());
@@ -46,6 +57,13 @@ public class OrderCreateCommandHandler {
         return orderDataMapper.orderToCreateOrderResponse(orderResult);
     }
 
+    /**
+     * 주문 생성 시 제공된 식당 ID를 기반으로 식당 정보를 검증합니다.
+     *
+     * @param createOrderCommand 주문 생성에 필요한 정보를 담고 있는 커맨드 객체입니다.
+     * @return 검증된 식당 엔티티입니다.
+     * @throws OrderDomainException 식당 정보를 찾을 수 없는 경우 예외를 발생시킵니다.
+     */
     private Restaurant checkRestaurant(CreateOrderCommand createOrderCommand) {
         Restaurant restaurant = orderDataMapper.createOrderCommandToRestaurant(createOrderCommand);
         Optional<Restaurant> optionalRestaurant = restaurantRepository.findRestaurantInformation(restaurant);
@@ -57,6 +75,12 @@ public class OrderCreateCommandHandler {
         return optionalRestaurant.get();
     }
 
+    /**
+     * 주문 생성 시 제공된 고객 ID를 기반으로 고객 정보를 검증합니다.
+     *
+     * @param customerId 주문을 생성하는 고객의 ID입니다.
+     * @throws OrderDomainException 고객 정보를 찾을 수 없는 경우 예외를 발생시킵니다.
+     */
     private void checkCustomer(UUID customerId) {
         Optional<Customer> customer = customerRepository.findCustomer(customerId);
         if (customer.isEmpty()) {
@@ -65,6 +89,13 @@ public class OrderCreateCommandHandler {
         }
     }
 
+    /**
+     * 주문 엔티티를 저장하고 저장된 주문 엔티티를 반환합니다.
+     *
+     * @param order 저장할 주문 엔티티입니다.
+     * @return 저장된 주문 엔티티입니다.
+     * @throws OrderDomainException 주문을 저장할 수 없는 경우 예외를 발생시킵니다.
+     */
     private Order saveOrder(Order order) {
         Order orderResult =  orderRepository.save(order);
         if(orderResult == null){
