@@ -39,7 +39,7 @@ public class OrderCreateCommandHandler {
         // OrderCreatedEvent 가 발생되면 이후에 메시지를 퍼블리싱한다.(persistOrder 메서드는 @Transactional 이어서 실패시 롤백)
         orderCreatedPaymentRequestMessagePublisher.publish(orderCreatedEvent);
 
-        return orderDataMapper.orderToCreateOrderResponse(orderCreatedEvent.getOrder());
+        return orderDataMapper.orderToCreateOrderResponse(orderCreatedEvent.getOrder(), "주문이 성공적으로 생성되었습니다.");
     }
 
 }

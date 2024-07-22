@@ -63,10 +63,11 @@ public class OrderDataMapper {
      * @param order 변환할 Order 엔티티입니다.
      * @return 주문 추적 ID와 주문 상태를 포함하는 CreateOrderResponse DTO를 반환합니다.
      */
-    public CreateOrderResponse orderToCreateOrderResponse(Order order) {
+    public CreateOrderResponse orderToCreateOrderResponse(Order order, String message) {
         return CreateOrderResponse.builder()
                 .orderTrackingId(order.getTrackingId().getValue())
                 .orderStatus(order.getOrderStatus())
+                .message(message)
                 .build();
     }
 
