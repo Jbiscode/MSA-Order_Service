@@ -38,6 +38,8 @@ public class OrderCreateCommandHandler {
 
     private final OrderDataMapper orderDataMapper;
 
+    private final ApplicationDomainEventPublisher applicationDomainEventPublisher;
+
     /**
      * 주문 생성 요청을 처리하고 주문 생성 결과를 반환합니다.
      *
@@ -53,6 +55,7 @@ public class OrderCreateCommandHandler {
         OrderCreatedEvent orderCreatedEvent = orderDomainService.validateAndInitiateOrder(order, restaurant);
         Order orderResult = saveOrder(order);
         log.info("주문이 생성되었습니다. orderId: {}", orderResult.getId().getValue());
+        applicationDomainEventPublisher.publish(orderCreatedEvent);
 
         return orderDataMapper.orderToCreateOrderResponse(orderResult);
     }
