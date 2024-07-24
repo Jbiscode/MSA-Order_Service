@@ -18,6 +18,7 @@
         <module>order-service</module>
         <module>order-service/order-domain/order-application-service</module>
         <module>common</module>
+        <module>infrastructure</module>
     </modules>
 
     <!--    기본값은 Jar 이고 pom 으로 패키징을 변경해야함. -->

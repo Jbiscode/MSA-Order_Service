@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  init-kafka:
+    image: confluentinc/cp-kafka:${KAFKA_VERSION:-latest}
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # 카프카 브로커가 준비 될 때까지 대기
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --list
+
+      echo -e '존재하는 Kafka 토픽을 삭제합니다.'
+
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic payment-request --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic payment-response --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic restaurant-approval-request --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic restaurant-approval-response --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic customer --delete --if-exists
+
+      echo -e 'Kafka 토픽을 생성합니다.'
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic payment-request --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic payment-response --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic restaurant-approval-request --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic restaurant-approval-response --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic customer --replication-factor 3 --partitions 3
+
+
+      echo -e '성공적으로 kafka 토픽들을 생성하였습니다.'
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --list
+      "
+    networks:
+      - ${GLOBAL_NETWORK:-kafka}

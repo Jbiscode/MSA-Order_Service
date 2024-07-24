@@ -33,3 +33,4 @@ build/
 .vscode/
 /lib
 .DS_Store
+/infrastructure/docker-compose/volumes
