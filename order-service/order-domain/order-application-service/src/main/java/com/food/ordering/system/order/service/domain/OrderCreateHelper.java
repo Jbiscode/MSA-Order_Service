@@ -55,7 +55,7 @@ public class OrderCreateHelper {
         Order order = orderDataMapper.createOrderCommandToOrder(createOrderCommand);
         OrderCreatedEvent orderCreatedEvent = orderDomainService.validateAndInitiateOrder(order, restaurant);
         saveOrder(order);
-        log.info("주문이 생성되었습니다. orderId: {}", orderCreatedEvent.getOrder().getId().getValue());
+        log.info("주문이 생성되었습니다.persistOrder=> orderId: {}", orderCreatedEvent.getOrder().getId().getValue());
 
         return orderCreatedEvent;
     }

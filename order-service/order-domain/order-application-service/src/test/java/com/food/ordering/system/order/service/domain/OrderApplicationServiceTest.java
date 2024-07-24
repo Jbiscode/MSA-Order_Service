@@ -3,21 +3,25 @@ package com.food.ordering.system.order.service.domain;
 import com.food.ordering.system.domain.valueobject.CustomerId;
 import com.food.ordering.system.domain.valueobject.Money;
 import com.food.ordering.system.domain.valueobject.OrderId;
+import com.food.ordering.system.domain.valueobject.OrderStatus;
 import com.food.ordering.system.domain.valueobject.ProductId;
 import com.food.ordering.system.domain.valueobject.RestaurantId;
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderCommand;
+import com.food.ordering.system.order.service.domain.dto.create.CreateOrderResponse;
 import com.food.ordering.system.order.service.domain.dto.create.OrderAddress;
 import com.food.ordering.system.order.service.domain.dto.create.OrderItem;
 import com.food.ordering.system.order.service.domain.entity.Customer;
 import com.food.ordering.system.order.service.domain.entity.Order;
 import com.food.ordering.system.order.service.domain.entity.Product;
 import com.food.ordering.system.order.service.domain.entity.Restaurant;
+import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
 import com.food.ordering.system.order.service.domain.mapper.OrderDataMapper;
 import com.food.ordering.system.order.service.domain.ports.input.service.OrderApplicationService;
 import com.food.ordering.system.order.service.domain.ports.output.repository.CustomerRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.OrderRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.RestaurantRepository;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -57,8 +63,8 @@ public class OrderApplicationServiceTest {
 
     private final UUID CUSTOMER_ID = UUID.fromString("f4b5e7c0-6f7b-4f6e-8b9a-3b9c0b3e1b1e");
     private final UUID RESTAURANT_ID = UUID.fromString("d3c0a6bd-8c74-4b7b-9bcc-981e5d2d8b77");
-    private final UUID PRODUCT_ID = UUID.fromString("a1b2c3d4-e5f6-7g8h-9i0j-1k2l3m4n5o6p");
-    private final UUID ORDER_ID = UUID.fromString("7f8g9h0i-j1k2-l3m4-n5o6-p7q8r9s0t1u2");
+    private final UUID PRODUCT_ID = UUID.fromString("a1b2c3d4-e5f6-8b9a-3a0b-3b9c0b3e1b1e");
+    private final UUID ORDER_ID = UUID.fromString("08e59627-9945-416e-9d95-298047796a4b");
     private final BigDecimal PRICE = new BigDecimal("200.00");
 
     @BeforeAll
@@ -140,8 +146,10 @@ public class OrderApplicationServiceTest {
 
         Restaurant restaurantInformation = Restaurant.builder()
                 .restaurantId(new RestaurantId(RESTAURANT_ID))
-                .products(List.of(new Product(new ProductId(PRODUCT_ID),"제품 1",new Money(new BigDecimal("50.00"))),
-                        new Product(new ProductId(PRODUCT_ID),"제품 2",new Money(new BigDecimal("50.00")))))
+                .products(List.of(
+                        new Product(new ProductId(PRODUCT_ID),"제품 1",new Money(new BigDecimal("50.00"))),
+                        new Product(new ProductId(PRODUCT_ID),"제품 2",new Money(new BigDecimal("50.00"))))
+                )
                 .active(true)
                 .build();
 
@@ -155,5 +163,43 @@ public class OrderApplicationServiceTest {
 
     }
 
+    @Test
+    public void createOrder(){
+        CreateOrderResponse createOrderResponse = orderApplicationService.createOrder(createOrderCommand);
+        assertThat(createOrderResponse.getOrderStatus()).isEqualTo(OrderStatus.PENDING);
+        assertThat(createOrderResponse.getMessage()).isEqualTo("주문이 성공적으로 생성되었습니다.");
+        assertThat(createOrderResponse.getOrderTrackingId()).isNotNull();
+    }
 
+    @Test
+    public void testCreateOrderWithWrongTotalPrice(){
+        assertThatThrownBy(() -> orderApplicationService.createOrder(createOrderCommandWrongPrice))
+                .isInstanceOf(OrderDomainException.class)
+                .hasMessage("종합 가격: 250.00 과 아이템 가격: 200.00 가 일치하지 않습니다.");
+    }
+
+    @Test
+    public void testCreateOrderWithWrongProductPrice(){
+        assertThatThrownBy(() -> orderApplicationService.createOrder(createOrderCommandWrongProductPrice))
+                .isInstanceOf(OrderDomainException.class)
+                .hasMessage("주문 상품 가격: 60.00 과 상품: " + PRODUCT_ID + " 가 일치하지 않습니다.");
+    }
+
+    @Test
+    public void testCreateOrderWithPassiveRestaurant(){
+        Restaurant restaurantInformation = Restaurant.builder()
+                .restaurantId(new RestaurantId(RESTAURANT_ID))
+                .products(List.of(
+                        new Product(new ProductId(PRODUCT_ID),"제품 1",new Money(new BigDecimal("50.00"))),
+                        new Product(new ProductId(PRODUCT_ID),"제품 2",new Money(new BigDecimal("50.00"))))
+                )
+                .active(false)
+                .build();
+
+        when(restaurantRepository.findRestaurantInformation(orderDataMapper.createOrderCommandToRestaurant(createOrderCommand))).thenReturn(Optional.of(restaurantInformation));
+
+        assertThatThrownBy(() -> orderApplicationService.createOrder(createOrderCommand))
+                .isInstanceOf(OrderDomainException.class)
+                .hasMessage("레스토랑: " + RESTAURANT_ID + "는 현재 주문을 받지 않습니다.");
+    }
 }
