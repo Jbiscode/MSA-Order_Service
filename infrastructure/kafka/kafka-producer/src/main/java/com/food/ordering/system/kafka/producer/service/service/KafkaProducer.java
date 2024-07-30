@@ -1,5 +1,6 @@
 package com.food.ordering.system.kafka.producer.service.service;
 
+import com.food.ordering.system.kafka.producer.service.dto.KafkaMessageHelperRequest;
 import org.apache.avro.specific.SpecificRecordBase;
 
 import java.io.Serializable;
@@ -15,5 +16,5 @@ public interface KafkaProducer <K extends Serializable, V extends SpecificRecord
      * @return CompletableFuture<Void> 를 사용해서 비동기 처리를 한다.
      *
      */
-    CompletableFuture<Void> send(String topic, K key, V message);
+    CompletableFuture<Void> send(String topic, K key, V message, KafkaMessageHelperRequest kafkaMessageHelperRequests);
 }

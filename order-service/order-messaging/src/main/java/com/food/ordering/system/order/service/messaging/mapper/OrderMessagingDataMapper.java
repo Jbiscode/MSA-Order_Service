@@ -2,9 +2,12 @@ package com.food.ordering.system.order.service.messaging.mapper;
 
 import com.food.ordering.system.kafka.order.avro.model.PaymentOrderStatus;
 import com.food.ordering.system.kafka.order.avro.model.PaymentRequestAvroModel;
+import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalRequestAvroModel;
+import com.food.ordering.system.kafka.order.avro.model.RestaurantOrderStatus;
 import com.food.ordering.system.order.service.domain.entity.Order;
 import com.food.ordering.system.order.service.domain.event.OrderCancelledEvent;
 import com.food.ordering.system.order.service.domain.event.OrderCreatedEvent;
+import com.food.ordering.system.order.service.domain.event.OrderPaidEvent;
 
 import java.util.UUID;
 
@@ -22,7 +25,7 @@ public class OrderMessagingDataMapper {
                 .build();
     }
 
-    public PaymentRequestAvroModel OrderCancelledEventToPaymentRequestAvroModel(OrderCancelledEvent orderCancelledEvent) {
+    public PaymentRequestAvroModel orderCancelledEventToPaymentRequestAvroModel(OrderCancelledEvent orderCancelledEvent) {
         Order order = orderCancelledEvent.getOrder();
         return PaymentRequestAvroModel.newBuilder()
                 .setId(UUID.randomUUID())
@@ -31,6 +34,18 @@ public class OrderMessagingDataMapper {
                 .setPrice(order.getPrice().getAmount())
                 .setCreatedAt(orderCancelledEvent.getCreatedAt().toInstant())
                 .setPaymentOrderStatus(PaymentOrderStatus.CANCELLED)
+                .build();
+    }
+
+    public RestaurantApprovalRequestAvroModel orderPaidEventToRestaurantApprovalRequestAvroModel(OrderPaidEvent orderPaidEvent) {
+        Order order = orderPaidEvent.getOrder();
+        return RestaurantApprovalRequestAvroModel.newBuilder()
+                .setId(UUID.randomUUID())
+                .setSagaId(UUID.randomUUID())
+                .setOrderId(UUID.fromString(order.getId().getValue().toString()))
+                .setPrice(order.getPrice().getAmount())
+                .setCreatedAt(orderPaidEvent.getCreatedAt().toInstant())
+                .setRestaurantOrderStatus(RestaurantOrderStatus.PAID)
                 .build();
     }
 }
