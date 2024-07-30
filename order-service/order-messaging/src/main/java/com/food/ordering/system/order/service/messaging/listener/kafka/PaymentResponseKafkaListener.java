@@ -24,7 +24,7 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<PaymentRespon
     private final OrderMessagingDataMapper orderMessagingDataMapper;
 
     @Override
-    @KafkaListener(id = "${kafka-consumer-config.payment.consumer.group-id}",
+    @KafkaListener(id = "${kafka-consumer-config.payment-consumer-group-id}",
             topics = "${order-service.payment-response-topic-name}")
     public void receive(@Payload List<PaymentResponseAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
