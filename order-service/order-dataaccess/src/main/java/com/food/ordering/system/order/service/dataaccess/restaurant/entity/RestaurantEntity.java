@@ -21,7 +21,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @IdClass(RestaurantEntityId.class)
-@Table(name = "order_resataurant_m_view", schema = "restaurant")
+@Table(name = "order_restaurant_m_view", schema = "restaurant")
 @Entity
 public class RestaurantEntity {
 
