@@ -7,10 +7,12 @@ import com.food.ordering.system.order.service.dataaccess.restaurant.entity.Resta
 import com.food.ordering.system.order.service.dataaccess.restaurant.exception.RestaurantDataAccessException;
 import com.food.ordering.system.order.service.domain.entity.Product;
 import com.food.ordering.system.order.service.domain.entity.Restaurant;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
+@Component
 public class RestaurantDataAccessMapper {
 
     public List<UUID> restaurantToRestaurantProducts(Restaurant restaurant) {
