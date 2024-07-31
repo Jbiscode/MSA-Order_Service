@@ -22,7 +22,7 @@ import java.util.UUID;
 @Slf4j
 public class OrderDomainServiceImpl implements OrderDomainService{
 
-    private static final String UTC = "UTC";
+    private static final String ASIA_SEOUL = "ASIA/SEOUL";
 
     /**
      * 주문과 레스토랑 정보를 검증하고 주문을 초기화합니다.
@@ -40,7 +40,7 @@ public class OrderDomainServiceImpl implements OrderDomainService{
         order.initializeOrder();
         log.info("Order id: {} created successfully", order.getId().getValue());
 
-        return new OrderCreatedEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
+        return new OrderCreatedEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
     }
 
     /**
@@ -106,7 +106,7 @@ public class OrderDomainServiceImpl implements OrderDomainService{
     public OrderPaidEvent payOrder(Order order, Restaurant restaurant) {
         order.pay();
         log.info("Order id: {} paid successfully", order.getId().getValue());
-        return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
+        return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
     }
 
     /**
@@ -131,7 +131,7 @@ public class OrderDomainServiceImpl implements OrderDomainService{
     public OrderCancelledEvent cancelOrderPayment(Order order, List<String> failureMessages) {
         order.initCancel(failureMessages);
         log.info("Order id: {} start cancelling successfully", order.getId().getValue());
-        return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
+        return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
     }
 
     /**
