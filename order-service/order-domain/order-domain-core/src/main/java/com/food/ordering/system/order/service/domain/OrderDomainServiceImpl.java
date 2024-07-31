@@ -15,14 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import static com.food.ordering.system.domain.DomainConstants.ASIA_SEOUL;
+
 /**
  * 주문 도메인 서비스의 구현체입니다.
  * 주문 생성, 결제, 승인 및 취소와 같은 주문 관련 비즈니스 로직을 처리합니다.
  */
 @Slf4j
 public class OrderDomainServiceImpl implements OrderDomainService{
-
-    private static final String ASIA_SEOUL = "ASIA/SEOUL";
 
     /**
      * 주문과 레스토랑 정보를 검증하고 주문을 초기화합니다.

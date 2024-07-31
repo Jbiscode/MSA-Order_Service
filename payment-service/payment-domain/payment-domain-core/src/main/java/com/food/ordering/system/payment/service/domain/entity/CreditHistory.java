@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class CreditHistory extends BaseEntity<CreditHistoryId> {
 
-    private CustomerId customerId;
+    private final CustomerId customerId;
     private final Money creditAmount;
     private final TransactionalType transactionalType;
 }
