@@ -1,5 +1,6 @@
 package com.food.ordering.system.payment.service.domain;
 
+import com.food.ordering.system.domain.event.publisher.DomainEventPublisher;
 import com.food.ordering.system.domain.valueobject.Money;
 import com.food.ordering.system.domain.valueobject.PaymentStatus;
 import com.food.ordering.system.payment.service.domain.entity.CreditEntry;
@@ -35,7 +36,9 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
     public PaymentEvent validateAndInitiatePayment(Payment payment,
                                                     CreditEntry creditEntry,
                                                     List<CreditHistory> creditHistories,
-                                                    List<String> failureMessages) {
+                                                    List<String> failureMessages,
+                                                    DomainEventPublisher<PaymentCompletedEvent> paymentCompletedEventDomainEventPublisher,
+                                                    DomainEventPublisher<PaymentFailedEvent> paymentFailedEventDomainEventPublisher) {
         payment.validatePayment(failureMessages);
         payment.initializePayment();
         validateCreditEntry(payment, creditEntry, failureMessages);
@@ -49,14 +52,16 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
                     payment.getOrderId().getValue());
             payment.updatePaymentStatus(PaymentStatus.COMPLETED);
 
-            return new PaymentCancelledEvent(payment, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
+            return new PaymentCompletedEvent(payment, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
+                    paymentCompletedEventDomainEventPublisher);
         }else {
             log.error("결제가 실패하였습니다. CustomerId: {} OrderId: {}",
                     creditEntry.getCustomerId().getValue(),
                     payment.getOrderId().getValue());
             payment.updatePaymentStatus(PaymentStatus.FAILED);
 
-            return new PaymentFailedEvent(payment, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)), failureMessages);
+            return new PaymentFailedEvent(payment, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)), failureMessages,
+                    paymentFailedEventDomainEventPublisher);
         }
     }
 
@@ -72,7 +77,9 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
     public PaymentEvent validateAndCancelPayment(Payment payment,
                                                 CreditEntry creditEntry,
                                                 List<CreditHistory> creditHistories,
-                                                List<String> failureMessages) {
+                                                List<String> failureMessages,
+                                                DomainEventPublisher<PaymentCancelledEvent> paymentCancelledEventDomainEventPublisher,
+                                                DomainEventPublisher<PaymentFailedEvent> paymentFailedEventDomainEventPublisher) {
         payment.validatePayment(failureMessages);
         addCreditEntry(payment, creditEntry);
         updateCreditHistory(payment, creditHistories,TransactionalType.CREDIT);
@@ -83,14 +90,16 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
                     payment.getOrderId().getValue());
             payment.updatePaymentStatus(PaymentStatus.CANCELLED);
 
-            return new PaymentCompletedEvent(payment, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
+            return new PaymentCancelledEvent(payment, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
+                    paymentCancelledEventDomainEventPublisher);
         }else {
             log.error("결제가 취소가 실패하였습니다. CustomerId: {} OrderId: {}",
                     creditEntry.getCustomerId().getValue(),
                     payment.getOrderId().getValue());
             payment.updatePaymentStatus(PaymentStatus.FAILED);
 
-            return new PaymentFailedEvent(payment, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)), failureMessages);
+            return new PaymentFailedEvent(payment, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)), failureMessages,
+                    paymentFailedEventDomainEventPublisher);
         }
     }
 

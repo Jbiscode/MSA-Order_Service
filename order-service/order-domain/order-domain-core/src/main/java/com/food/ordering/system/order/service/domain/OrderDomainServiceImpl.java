@@ -1,5 +1,6 @@
 package com.food.ordering.system.order.service.domain;
 
+import com.food.ordering.system.domain.event.publisher.DomainEventPublisher;
 import com.food.ordering.system.order.service.domain.entity.Order;
 import com.food.ordering.system.order.service.domain.entity.Product;
 import com.food.ordering.system.order.service.domain.entity.Restaurant;
@@ -33,14 +34,17 @@ public class OrderDomainServiceImpl implements OrderDomainService{
      * @throws OrderDomainException 레스토랑이 비활성화 상태일 경우 예외를 발생시킵니다.
      */
     @Override
-    public OrderCreatedEvent validateAndInitiateOrder(Order order, Restaurant restaurant) {
+    public OrderCreatedEvent validateAndInitiateOrder(Order order,
+                                                      Restaurant restaurant,
+                                                      DomainEventPublisher<OrderCreatedEvent> orderCreatedEventDomainEventPublisher) {
         validateRestaurant(restaurant);
         setOrderProductInformation(order, restaurant);
         order.validateOrder();
         order.initializeOrder();
         log.info("Order id: {} created successfully", order.getId().getValue());
 
-        return new OrderCreatedEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
+        return new OrderCreatedEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
+                orderCreatedEventDomainEventPublisher);
     }
 
     /**
@@ -103,10 +107,13 @@ public class OrderDomainServiceImpl implements OrderDomainService{
      * @return 주문 결제 이벤트를 반환합니다.
      */
     @Override
-    public OrderPaidEvent payOrder(Order order, Restaurant restaurant) {
+    public OrderPaidEvent payOrder(Order order,
+                                    Restaurant restaurant,
+                                    DomainEventPublisher<OrderPaidEvent> orderPaidEventDomainEventPublisher) {
         order.pay();
         log.info("Order id: {} paid successfully", order.getId().getValue());
-        return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
+        return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
+                orderPaidEventDomainEventPublisher);
     }
 
     /**
@@ -128,10 +135,13 @@ public class OrderDomainServiceImpl implements OrderDomainService{
      * @return 주문 결제 취소 이벤트
      */
     @Override
-    public OrderCancelledEvent cancelOrderPayment(Order order, List<String> failureMessages) {
+    public OrderCancelledEvent cancelOrderPayment(Order order,
+                                                List<String> failureMessages,
+                                                DomainEventPublisher<OrderCancelledEvent> orderCancelledEventDomainEventPublisher) {
         order.initCancel(failureMessages);
         log.info("Order id: {} start cancelling successfully", order.getId().getValue());
-        return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
+        return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
+                orderCancelledEventDomainEventPublisher);
     }
 
     /**
