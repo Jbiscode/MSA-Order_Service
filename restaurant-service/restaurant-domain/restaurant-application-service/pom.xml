@@ -5,19 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.food.ordering.system</groupId>
-        <artifactId>food-ordering-system</artifactId>
+        <artifactId>restaurant-domain</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>order-service</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>order-domain</module>
-        <module>order-application</module>
-        <module>order-dataaccess</module>
-        <module>order-messaging</module>
-        <module>order-container</module>
-    </modules>
+    <artifactId>restaurant-application-service</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

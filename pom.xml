@@ -23,6 +23,7 @@
         <module>customer-service</module>
         <module>payment-service</module>
         <module>payment-service/payment-domain/payment-application-service</module>
+        <module>restaurant-service</module>
     </modules>
 
     <!--    기본값은 Jar 이고 pom 으로 패키징을 변경해야함. -->
