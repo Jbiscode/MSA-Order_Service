@@ -13,6 +13,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>order-domain-core</module>
+        <module>order-application-service</module>
     </modules>
 
     <properties>
