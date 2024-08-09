@@ -54,6 +54,9 @@
                     <image>
                         <name>${project.groupId}/payment.service:${project.version}</name>
                     </image>
+                    <jvmArguments>
+                        -Duser.timezone=Asia/Seoul
+                    </jvmArguments>
                 </configuration>
                 <executions>
                     <execution>

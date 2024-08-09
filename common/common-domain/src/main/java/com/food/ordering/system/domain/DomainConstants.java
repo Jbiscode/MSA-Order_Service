@@ -5,6 +5,6 @@ public class DomainConstants {
     private DomainConstants() {
     }
 
-    public static final String ASIA_SEOUL = "ASIA/SEOUL";
+    public static final String ASIA_SEOUL = "Asia/Seoul";
 
 }
