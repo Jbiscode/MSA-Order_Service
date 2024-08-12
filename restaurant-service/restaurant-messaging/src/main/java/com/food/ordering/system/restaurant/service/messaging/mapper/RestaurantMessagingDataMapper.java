@@ -44,17 +44,18 @@ public class RestaurantMessagingDataMapper {
                 .build();
     }
 
-    public RestaurantApprovalRequest restaurantApprovalRequestAvroModelToRestaurantApproval(RestaurantApprovalRequestAvroModel restaurantApprovalRequestAvroModel){
+    public RestaurantApprovalRequest restaurantApprovalRequestAvroModelToRestaurantApprovalRequest(RestaurantApprovalRequestAvroModel restaurantApprovalRequestAvroModel){
         return RestaurantApprovalRequest.builder()
                 .id(restaurantApprovalRequestAvroModel.getId().toString())
                 .sagaId(restaurantApprovalRequestAvroModel.getSagaId().toString())
+                .orderId(restaurantApprovalRequestAvroModel.getOrderId().toString())
                 .restaurantId(restaurantApprovalRequestAvroModel.getRestaurantId().toString())
                 .restaurantOrderStatus(RestaurantOrderStatus.valueOf(
                         restaurantApprovalRequestAvroModel.getRestaurantOrderStatus().name()))
                 .products(restaurantApprovalRequestAvroModel.getProducts().stream()
                         .map(avroModel ->
                                 Product.builder()
-                                        .id(new ProductId(UUID.fromString(avroModel.getId())))
+                                        .id(new ProductId(avroModel.getId()))
                                         .quantity(avroModel.getQuantity())
                                         .build())
                         .collect(Collectors.toList())

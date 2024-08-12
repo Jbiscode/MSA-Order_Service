@@ -39,7 +39,7 @@ public class RestaurantApprovalRequestKafkaListener implements KafkaConsumer<Res
         messages.forEach(restaurantApprovalRequestAvroModel -> {
             log.info("식당승인요청을 처리중입니다. order id: {}", restaurantApprovalRequestAvroModel.getOrderId());
             restaurantApprovalRequestMessageListener.approveOrder(
-                    restaurantMessagingDataMapper.restaurantApprovalRequestAvroModelToRestaurantApproval(restaurantApprovalRequestAvroModel)
+                    restaurantMessagingDataMapper.restaurantApprovalRequestAvroModelToRestaurantApprovalRequest(restaurantApprovalRequestAvroModel)
             );
         });
     }
