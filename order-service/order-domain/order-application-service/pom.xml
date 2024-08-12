@@ -20,6 +20,10 @@
     <dependencies>
         <dependency>
             <groupId>com.food.ordering.system</groupId>
+            <artifactId>saga</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.food.ordering.system</groupId>
             <artifactId>order-domain-core</artifactId>
 <!--            버전을 명시안하면 undefined 오류가 발생(꼭 명시 해야함)-->
 <!--            <version>0.0.1-SNAPSHOT</version>-->

@@ -1,5 +1,6 @@
 package com.food.ordering.system.order.service.dataaccess.order.adapter;
 
+import com.food.ordering.system.domain.valueobject.OrderId;
 import com.food.ordering.system.order.service.dataaccess.order.mapper.OrderDataAccessMapper;
 import com.food.ordering.system.order.service.dataaccess.order.repository.OrderJpaRepository;
 import com.food.ordering.system.order.service.domain.entity.Order;
@@ -34,6 +35,21 @@ public class OrderRepositoryImpl implements OrderRepository {
                         orderDataAccessMapper.orderToOrderEntity(order)
                 )
         );
+    }
+
+    /**
+     * 주어진 OrderId를 사용하여 Order를 조회합니다.<br/><br/>
+     *
+     * 이 메서드는 OrderId를 사용하여 OrderJpaRepository에서 OrderEntity를 조회하고,<br/>
+     * 조회된 OrderEntity를 Order로 변환하여 반환합니다.
+     *
+     * @param orderId 조회할 Order의 OrderId
+     * @return 조회된 Order를 Optional로 감싸서 반환, Order가 없으면 Optional.empty() 반환
+     */
+    @Override
+    public Optional<Order> findById(OrderId orderId) {
+        return orderJpaRepository.findById(orderId.getValue())
+                .map(orderDataAccessMapper::orderEntityToOrder);
     }
 
     /**

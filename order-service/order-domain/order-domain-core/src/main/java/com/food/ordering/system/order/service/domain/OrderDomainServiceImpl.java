@@ -108,7 +108,6 @@ public class OrderDomainServiceImpl implements OrderDomainService{
      */
     @Override
     public OrderPaidEvent payOrder(Order order,
-                                    Restaurant restaurant,
                                     DomainEventPublisher<OrderPaidEvent> orderPaidEventDomainEventPublisher) {
         order.pay();
         log.info("Order id: {} paid successfully", order.getId().getValue());

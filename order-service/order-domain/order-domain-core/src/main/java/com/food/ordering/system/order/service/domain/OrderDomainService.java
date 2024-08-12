@@ -16,7 +16,6 @@ public interface OrderDomainService {
                                                 DomainEventPublisher<OrderCreatedEvent> orderCreatedEventDomainEventPublisher);
 
     OrderPaidEvent payOrder(Order order,
-                            Restaurant restaurant,
                             DomainEventPublisher<OrderPaidEvent> orderPaidEventDomainEventPublisher);
 
     void approveOrder(Order order);

@@ -37,6 +37,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.food.ordering.system</groupId>
+                <artifactId>saga</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 <!--            order-service 모듈 의존성 추가 -->
             <dependency>
                 <groupId>com.food.ordering.system</groupId>
