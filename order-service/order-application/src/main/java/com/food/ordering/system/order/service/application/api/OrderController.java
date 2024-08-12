@@ -42,6 +42,6 @@ public class OrderController {
                         .build()
         );
         log.info("주문추적완료=> 주문추적 ID: {} 주문상태: {}", trackOrderResponse.getOrderTrackingId(), trackOrderResponse.getOrderStatus());
-        return null;
+        return ResponseEntity.ok(trackOrderResponse);
     }
 }

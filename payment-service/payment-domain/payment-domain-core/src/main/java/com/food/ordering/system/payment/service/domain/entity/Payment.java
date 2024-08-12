@@ -14,6 +14,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.food.ordering.system.domain.DomainConstants.ASIA_SEOUL;
+
 @Getter
 @SuperBuilder
 public class Payment extends AggregateRoot<PaymentId> {
@@ -27,7 +29,7 @@ public class Payment extends AggregateRoot<PaymentId> {
 
     public void initializePayment() {
         setId(new PaymentId(UUID.randomUUID()));
-        createdAt = ZonedDateTime.now(ZoneId.of("ASIA/SEOUL"));
+        createdAt = ZonedDateTime.now(ZoneId.of(ASIA_SEOUL));
     }
 
     public void validatePayment(List<String> failureMessages) {
