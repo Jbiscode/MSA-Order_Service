@@ -3,6 +3,7 @@ package com.food.ordering.system.order.service.messaging.mapper;
 import com.food.ordering.system.kafka.order.avro.model.PaymentOrderStatus;
 import com.food.ordering.system.kafka.order.avro.model.PaymentRequestAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.PaymentResponseAvroModel;
+import com.food.ordering.system.kafka.order.avro.model.Product;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalRequestAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalResponseAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.RestaurantOrderStatus;
@@ -15,6 +16,7 @@ import com.food.ordering.system.order.service.domain.event.OrderPaidEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class OrderMessagingDataMapper {
@@ -51,7 +53,16 @@ public class OrderMessagingDataMapper {
                 .setId(UUID.randomUUID())
                 .setSagaId(UUID.randomUUID())
                 .setOrderId(UUID.fromString(order.getId().getValue().toString()))
+                .setRestaurantId(UUID.fromString(order.getRestaurantId().getValue().toString()))
                 .setPrice(order.getPrice().getAmount())
+                .setProducts(order.getItems().stream().map(
+                        item->
+                                Product.newBuilder()
+                                        .setId(item.getProduct().getId().getValue())
+                                        .setQuantity(item.getQuantity())
+                                        .build())
+                                        .collect(Collectors.toList())
+                )
                 .setCreatedAt(orderPaidEvent.getCreatedAt().toInstant())
                 .setRestaurantOrderStatus(RestaurantOrderStatus.PAID)
                 .build();
