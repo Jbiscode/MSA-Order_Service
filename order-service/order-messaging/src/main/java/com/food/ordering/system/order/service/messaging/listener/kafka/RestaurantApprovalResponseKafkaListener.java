@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.food.ordering.system.order.service.domain.entity.Order.FAILURE_MESSAGE_DELIMITER;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -38,22 +40,20 @@ public class RestaurantApprovalResponseKafkaListener implements KafkaConsumer<Re
                 , offsets.toString());
 
         messages.forEach(restaurantApprovalResponseAvroModel -> {
-            try {
+
                 if (OrderApprovalStatus.APPROVED == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
                     log.info("식당승인응답을 처리합니다. order id: {}", restaurantApprovalResponseAvroModel.getOrderId());
                     restaurantApprovalResponseMessageListener.orderApproved(
                             orderMessagingDataMapper.restaurantApprovalResponseAvroModelToRestaurantApprovalResponseEvent(restaurantApprovalResponseAvroModel)
                     );
                 } else if (OrderApprovalStatus.REJECTED == restaurantApprovalResponseAvroModel.getOrderApprovalStatus()) {
-                    log.info("식당승인응답을 실패했습니다. order id: {}", restaurantApprovalResponseAvroModel.getOrderId());
+                    log.info("식당승인응답을 실패했습니다. order id: {} with failureMessage {}", restaurantApprovalResponseAvroModel.getOrderId(),
+                            String.join(FAILURE_MESSAGE_DELIMITER, restaurantApprovalResponseAvroModel.getFailureMessages()));
                     restaurantApprovalResponseMessageListener.orderRejected(
                             orderMessagingDataMapper.restaurantApprovalResponseAvroModelToRestaurantApprovalResponseEvent(restaurantApprovalResponseAvroModel)
                     );
                 }
-            } catch (Exception e) {
-                log.error("식당승인응답을 처리하는 도중 오류가 발생했습니다. restaurantApprovalResponseAvroModel: {} & error: {}",
-                        restaurantApprovalResponseAvroModel, e.getMessage());
-            }
+
         });
     }
 }

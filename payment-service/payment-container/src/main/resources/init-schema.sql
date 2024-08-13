@@ -8,7 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 DROP TYPE IF EXISTS payment_status CASCADE;
 CREATE TYPE payment_status AS ENUM (
     'COMPLETED',
-    'CANCELED',
+    'CANCELLED',
     'FAILED'
     );
 

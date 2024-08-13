@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.food.ordering.system.order.service.domain.entity.Order.FAILURE_MESSAGE_DELIMITER;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -36,7 +38,7 @@ public class OrderApprovalSaga implements SagaStep<RestaurantApprovalResponse, E
     @Override
     @Transactional
     public OrderCancelledEvent rollback(RestaurantApprovalResponse data) {
-        log.info("주문 승인 롤백 이벤트 수신중: {}", data.getOrderId());
+        log.info("주문 승인 롤백 이벤트 수신중: {} with failureMessages {}", data.getOrderId(), String.join(FAILURE_MESSAGE_DELIMITER,data.getFailureMessages()));
         Order order = orderSagaHelper.findOrder(data.getOrderId());
         OrderCancelledEvent domainEvent = orderDomainService.cancelOrderPayment(
                 order,

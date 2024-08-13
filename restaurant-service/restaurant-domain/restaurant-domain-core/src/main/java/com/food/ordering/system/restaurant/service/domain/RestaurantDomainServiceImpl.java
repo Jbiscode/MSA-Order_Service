@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.food.ordering.system.domain.DomainConstants.ASIA_SEOUL;
@@ -30,7 +31,7 @@ public class RestaurantDomainServiceImpl implements RestaurantDomainService {
             restaurant.constructOrderApproval(OrderApprovalStatus.APPROVED);
             return new OrderApprovedEvent(restaurant.getOrderApproval(),
                     restaurant.getId(),
-                    List.of(),
+                    new ArrayList<>(),
                     ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
                     orderApprovedEventDomainEventPublisher);
         }else{
