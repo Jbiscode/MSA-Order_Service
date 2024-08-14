@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface PaymentOutboxRepository {
 
-    OrderPaymentOutboxMessage save(OrderPaymentOutboxMessage orderPaymentOutboxMessage);
+    Optional<OrderPaymentOutboxMessage> save(OrderPaymentOutboxMessage orderPaymentOutboxMessage);
 
     Optional<List<OrderPaymentOutboxMessage>> findByTypeAndOutboxStatusAndSagaStatus(String type,
                                                                                      OutboxStatus outboxStatus,
