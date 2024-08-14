@@ -105,12 +105,10 @@ public class OrderDomainServiceImpl implements OrderDomainService{
      * @return 주문 결제 이벤트를 반환합니다.
      */
     @Override
-    public OrderPaidEvent payOrder(Order order,
-                                    DomainEventPublisher<OrderPaidEvent> orderPaidEventDomainEventPublisher) {
+    public OrderPaidEvent payOrder(Order order) {
         order.pay();
         log.info("Order id: {} paid successfully", order.getId().getValue());
-        return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
-                orderPaidEventDomainEventPublisher);
+        return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
     }
 
     /**
@@ -133,12 +131,10 @@ public class OrderDomainServiceImpl implements OrderDomainService{
      */
     @Override
     public OrderCancelledEvent cancelOrderPayment(Order order,
-                                                List<String> failureMessages,
-                                                DomainEventPublisher<OrderCancelledEvent> orderCancelledEventDomainEventPublisher) {
+                                                List<String> failureMessages) {
         order.initCancel(failureMessages);
         log.info("Order id: {} start cancelling successfully", order.getId().getValue());
-        return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
-                orderCancelledEventDomainEventPublisher);
+        return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
     }
 
     /**

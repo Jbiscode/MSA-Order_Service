@@ -4,8 +4,6 @@ import com.food.ordering.system.domain.event.EmptyEvent;
 import com.food.ordering.system.order.service.domain.dto.message.RestaurantApprovalResponse;
 import com.food.ordering.system.order.service.domain.entity.Order;
 import com.food.ordering.system.order.service.domain.event.OrderCancelledEvent;
-import com.food.ordering.system.order.service.domain.ports.output.message.publisher.payment.OrderCancelledPaymentRequestMessagePublisher;
-import com.food.ordering.system.order.service.domain.ports.output.repository.OrderRepository;
 import com.food.ordering.system.saga.SagaStep;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +19,6 @@ public class OrderApprovalSaga implements SagaStep<RestaurantApprovalResponse, E
 
     private final OrderDomainService orderDomainService;
     private final OrderSagaHelper orderSagaHelper;
-    private final OrderCancelledPaymentRequestMessagePublisher orderCancelledPaymentRequestMessagePublisher;
 
     @Override
     @Transactional
@@ -42,8 +39,7 @@ public class OrderApprovalSaga implements SagaStep<RestaurantApprovalResponse, E
         Order order = orderSagaHelper.findOrder(data.getOrderId());
         OrderCancelledEvent domainEvent = orderDomainService.cancelOrderPayment(
                 order,
-                data.getFailureMessages(),
-                orderCancelledPaymentRequestMessagePublisher);
+                data.getFailureMessages());
         orderSagaHelper.saveOrder(order);
         log.info("주문 승인 롤백 완료: {}", data.getOrderId());
         return domainEvent;
