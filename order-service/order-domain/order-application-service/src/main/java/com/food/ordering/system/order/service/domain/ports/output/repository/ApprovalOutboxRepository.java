@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface ApprovalOutboxRepository {
 
-    OrderPaymentOutboxMessage save(OrderApprovalOutboxMessage orderApprovalOutboxMessage);
+    Optional<OrderApprovalOutboxMessage> save(OrderApprovalOutboxMessage orderApprovalOutboxMessage);
 
     Optional<List<OrderApprovalOutboxMessage>> findByTypeAndOutboxStatusAndSagaStatus(String type,
                                                                                      OutboxStatus outboxStatus,
