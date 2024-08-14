@@ -55,4 +55,14 @@ public class PaymentOutboxHelper {
                 });
         log.info("OrderPaymentOutboxMessage 를 저장했습니다. OrderPaymentOutboxMessage: {}", orderPaymentOutboxMessage.getId());
     }
+
+    @Transactional
+    public void deletePaymentOutboxMessageByOutboxStatusAndSagaStatus(OutboxStatus outboxStatus,
+                                                                    SagaStatus... sagaStatus) {
+        paymentOutboxRepository.deleteByTypeAndOutboxStatusAndSagaStatus(
+                ORDER_SAGA_NAME,
+                outboxStatus,
+                sagaStatus
+        );
+    }
 }
