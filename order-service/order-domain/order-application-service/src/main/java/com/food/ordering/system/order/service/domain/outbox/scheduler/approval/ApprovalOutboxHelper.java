@@ -60,6 +60,25 @@ public class ApprovalOutboxHelper {
     }
 
     @Transactional
+    public void saveApprovalOutboxMessage(OrderApprovalEventPayload orderApprovalEventPayload,
+                                          OrderStatus orderStatus,
+                                          SagaStatus sagaStatus,
+                                          OutboxStatus outboxStatus,
+                                          UUID sagaId) {
+        save(OrderApprovalOutboxMessage.builder()
+                .id(UUID.randomUUID())
+                .sagaId(sagaId)
+                .type(ORDER_SAGA_NAME)
+                .payload(createPayload(orderApprovalEventPayload))
+                .orderStatus(orderStatus)
+                .sagaStatus(sagaStatus)
+                .outboxStatus(outboxStatus)
+                .createdAt(orderApprovalEventPayload.getCreatedAt())
+                .build()
+        );
+    }
+
+    @Transactional
     public void deleteApprovalOutboxMessageByOutboxStatusAndSagaStatus(OutboxStatus outboxStatus,
                                                                        SagaStatus... sagaStatus) {
         approvalOutboxRepository.deleteByTypeAndOutboxStatusAndSagaStatus(
@@ -69,4 +88,14 @@ public class ApprovalOutboxHelper {
         );
     }
 
+    private String createPayload(OrderApprovalEventPayload orderApprovalEventPayload) {
+        try {
+            return objectMapper.writeValueAsString(orderApprovalEventPayload);
+        } catch (JsonProcessingException e) {
+            log.error("OrderApprovalEventPayload 를 받지 못했습니다. for order id: {}",
+                    orderApprovalEventPayload.getOrderId(), e);
+            throw new OrderDomainException("OrderApprovalEventPayload 를 받지 못했습니다.for order id: " +
+                    orderApprovalEventPayload.getOrderId(), e);
+        }
+    }
 }
