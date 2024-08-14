@@ -8,7 +8,4 @@ public class OrderCreatedEvent extends OrderEvent {
         super(order, createdAt);
     }
 
-    @Override
-    public void fire() {
-    }
 }
