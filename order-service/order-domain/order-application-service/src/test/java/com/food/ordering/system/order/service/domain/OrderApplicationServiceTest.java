@@ -1,5 +1,7 @@
 package com.food.ordering.system.order.service.domain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.food.ordering.system.domain.valueobject.CustomerId;
 import com.food.ordering.system.domain.valueobject.Money;
 import com.food.ordering.system.domain.valueobject.OrderId;
@@ -16,10 +18,15 @@ import com.food.ordering.system.order.service.domain.entity.Product;
 import com.food.ordering.system.order.service.domain.entity.Restaurant;
 import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
 import com.food.ordering.system.order.service.domain.mapper.OrderDataMapper;
+import com.food.ordering.system.order.service.domain.outbox.model.payment.OrderPaymentEventPayload;
+import com.food.ordering.system.order.service.domain.outbox.model.payment.OrderPaymentOutboxMessage;
 import com.food.ordering.system.order.service.domain.ports.input.service.OrderApplicationService;
 import com.food.ordering.system.order.service.domain.ports.output.repository.CustomerRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.OrderRepository;
+import com.food.ordering.system.order.service.domain.ports.output.repository.PaymentOutboxRepository;
 import com.food.ordering.system.order.service.domain.ports.output.repository.RestaurantRepository;
+import com.food.ordering.system.outbox.OutboxStatus;
+import com.food.ordering.system.saga.SagaStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -27,10 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.food.ordering.system.saga.order.SagaConstants.ORDER_SAGA_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,6 +65,10 @@ public class OrderApplicationServiceTest {
     private CustomerRepository customerRepository;
     @Autowired
     private RestaurantRepository restaurantRepository;
+    @Autowired
+    private PaymentOutboxRepository paymentOutboxRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private CreateOrderCommand createOrderCommand;
     private CreateOrderCommand createOrderCommandWrongPrice;
@@ -65,6 +78,7 @@ public class OrderApplicationServiceTest {
     private final UUID RESTAURANT_ID = UUID.fromString("d3c0a6bd-8c74-4b7b-9bcc-981e5d2d8b77");
     private final UUID PRODUCT_ID = UUID.fromString("a1b2c3d4-e5f6-8b9a-3a0b-3b9c0b3e1b1e");
     private final UUID ORDER_ID = UUID.fromString("08e59627-9945-416e-9d95-298047796a4b");
+    private final UUID SAGA_ID = UUID.fromString("08e59627-9945-416e-9d95-298047796a4a");
     private final BigDecimal PRICE = new BigDecimal("200.00");
 
     @BeforeAll
@@ -160,11 +174,12 @@ public class OrderApplicationServiceTest {
         when(customerRepository.findCustomer(CUSTOMER_ID)).thenReturn(Optional.of(customer));
         when(restaurantRepository.findRestaurantInformation(orderDataMapper.createOrderCommandToRestaurant(createOrderCommand))).thenReturn(Optional.of(restaurantInformation));
         when(orderRepository.save(any(Order.class))).thenReturn(order);
+        when(paymentOutboxRepository.save(any(OrderPaymentOutboxMessage.class))).thenReturn(Optional.ofNullable(getOrderPaymentOutboxMessage()));
 
     }
 
     @Test
-    public void createOrder(){
+    public void testCreateOrder(){
         CreateOrderResponse createOrderResponse = orderApplicationService.createOrder(createOrderCommand);
         assertThat(createOrderResponse.getOrderStatus()).isEqualTo(OrderStatus.PENDING);
         assertThat(createOrderResponse.getMessage()).isEqualTo("주문이 성공적으로 생성되었습니다.");
@@ -201,5 +216,35 @@ public class OrderApplicationServiceTest {
         assertThatThrownBy(() -> orderApplicationService.createOrder(createOrderCommand))
                 .isInstanceOf(OrderDomainException.class)
                 .hasMessage("레스토랑: " + RESTAURANT_ID + "는 현재 주문을 받지 않습니다.");
+    }
+
+    private OrderPaymentOutboxMessage getOrderPaymentOutboxMessage() {
+        OrderPaymentEventPayload orderPaymentEventPayload = OrderPaymentEventPayload.builder()
+                .orderId(ORDER_ID.toString())
+                .customerId(CUSTOMER_ID.toString())
+                .price(PRICE)
+                .createdAt(ZonedDateTime.now())
+                .paymentOrderStatus(OrderStatus.PENDING.name())
+                .build();
+
+        return OrderPaymentOutboxMessage.builder()
+                .id(UUID.randomUUID())
+                .sagaId(SAGA_ID)
+                .type(ORDER_SAGA_NAME)
+                .payload(createPayload(orderPaymentEventPayload))
+                .orderStatus(OrderStatus.PENDING)
+                .sagaStatus(SagaStatus.STARTED)
+                .outboxStatus(OutboxStatus.STARTED)
+                .createdAt(ZonedDateTime.now())
+                .version(0)
+                .build();
+    }
+
+    private String createPayload(OrderPaymentEventPayload orderPaymentEventPayload) {
+        try {
+            return objectMapper.writeValueAsString(orderPaymentEventPayload);
+        } catch (JsonProcessingException e) {
+            throw new OrderDomainException("주문 결제 이벤트 페이로드를 생성하는 중에 오류가 발생했습니다.", e);
+        }
     }
 }
