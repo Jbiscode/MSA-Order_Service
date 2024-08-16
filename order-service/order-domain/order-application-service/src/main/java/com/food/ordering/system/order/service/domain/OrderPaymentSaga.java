@@ -39,7 +39,7 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
 
     @Override
     @Transactional
-    public synchronized void process(PaymentResponse data) {
+    public void process(PaymentResponse data) {
         log.info("결제 완료 이벤트 수신중: {}", data.getOrderId());
         Optional<OrderPaymentOutboxMessage> orderPaymentOutboxMessageResponse =
                 paymentOutboxHelper.getPaymentOutboxMessageBySagaIdAndSagaStatus(

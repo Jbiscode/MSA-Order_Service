@@ -13,6 +13,7 @@ import com.food.ordering.system.order.service.domain.entity.Order;
 import com.food.ordering.system.order.service.domain.entity.OrderItem;
 import com.food.ordering.system.order.service.domain.entity.Product;
 import com.food.ordering.system.order.service.domain.entity.Restaurant;
+import com.food.ordering.system.order.service.domain.event.OrderCancelledEvent;
 import com.food.ordering.system.order.service.domain.event.OrderCreatedEvent;
 import com.food.ordering.system.order.service.domain.event.OrderPaidEvent;
 import com.food.ordering.system.order.service.domain.outbox.model.approval.OrderApprovalEventPayload;
@@ -129,6 +130,16 @@ public class OrderDataMapper {
                 .build();
     }
 
+    public OrderPaymentEventPayload orderCancelledEventToOrderPaymentEventPayload(OrderCancelledEvent domainEvent) {
+        return OrderPaymentEventPayload.builder()
+                .customerId(domainEvent.getOrder().getCustomerId().getValue().toString())
+                .orderId(domainEvent.getOrder().getId().getValue().toString())
+                .price(domainEvent.getOrder().getPrice().getAmount())
+                .createdAt(domainEvent.getCreatedAt())
+                .paymentOrderStatus(PaymentOrderStatus.CANCELLED.name())
+                .build();
+    }
+
     public OrderApprovalEventPayload orderPaidEventToOrderApprovalEventPayload(OrderPaidEvent domainEvent) {
         return OrderApprovalEventPayload.builder()
                 .orderId(domainEvent.getOrder().getId().getValue().toString())
@@ -145,4 +156,5 @@ public class OrderDataMapper {
                         .collect(Collectors.toList()))
                 .build();
     }
+
 }
