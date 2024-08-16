@@ -16,5 +16,5 @@ public interface KafkaProducer <K extends Serializable, V extends SpecificRecord
      * @return CompletableFuture<Void> 를 사용해서 비동기 처리를 한다.
      *
      */
-    CompletableFuture<Void> send(String topic, K key, V message, KafkaMessageHelperRequest kafkaMessageHelperRequests);
+    <U> CompletableFuture<Void> send(String topic, K key, V message, KafkaMessageHelperRequest<U> kafkaMessageHelperRequests);
 }
