@@ -1,5 +1,10 @@
 package com.food.ordering.system.order.service.messaging.mapper;
 
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
 import com.food.ordering.system.kafka.order.avro.model.PaymentOrderStatus;
 import com.food.ordering.system.kafka.order.avro.model.PaymentRequestAvroModel;
 import com.food.ordering.system.kafka.order.avro.model.PaymentResponseAvroModel;
@@ -9,14 +14,8 @@ import com.food.ordering.system.kafka.order.avro.model.RestaurantApprovalRespons
 import com.food.ordering.system.kafka.order.avro.model.RestaurantOrderStatus;
 import com.food.ordering.system.order.service.domain.dto.message.PaymentResponse;
 import com.food.ordering.system.order.service.domain.dto.message.RestaurantApprovalResponse;
-import com.food.ordering.system.order.service.domain.entity.Order;
-import com.food.ordering.system.order.service.domain.event.OrderPaidEvent;
 import com.food.ordering.system.order.service.domain.outbox.model.approval.OrderApprovalEventPayload;
 import com.food.ordering.system.order.service.domain.outbox.model.payment.OrderPaymentEventPayload;
-import org.springframework.stereotype.Component;
-
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 public class OrderMessagingDataMapper {
