@@ -1,11 +1,9 @@
 package com.food.ordering.system.payment.service.domain.event;
 
-import com.food.ordering.system.domain.event.publisher.DomainEventPublisher;
 import com.food.ordering.system.payment.service.domain.entity.Payment;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * PaymentCompletedEvent 에서 PaymentCompletedMessagePublisher 를 사용해야하는데,<br>
@@ -18,18 +16,9 @@ import java.util.List;
  */
 public class PaymentCompletedEvent extends PaymentEvent {
 
-    private final DomainEventPublisher<PaymentCompletedEvent> paymentCompletedEventDomainEventPublisher;
-
     public PaymentCompletedEvent(Payment payment,
-                                ZonedDateTime createdAt,
-                                DomainEventPublisher<PaymentCompletedEvent> paymentCompletedEventDomainEventPublisher) {
+                                ZonedDateTime createdAt) {
         super(payment, createdAt, new ArrayList<>());
-        this.paymentCompletedEventDomainEventPublisher = paymentCompletedEventDomainEventPublisher;
     }
 
-    // 여기서 this는 PaymentCompletedEvent를 의미한다.
-    @Override
-    public void fire() {
-        paymentCompletedEventDomainEventPublisher.publish(this);
-    }
 }

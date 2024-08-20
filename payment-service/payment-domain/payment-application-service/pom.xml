@@ -22,6 +22,10 @@
         </dependency>
         <dependency>
             <groupId>com.food.ordering.system</groupId>
+            <artifactId>saga</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.food.ordering.system</groupId>
             <artifactId>common-domain</artifactId>
         </dependency>
         <dependency>
@@ -43,6 +47,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.food.ordering.system</groupId>
+            <artifactId>order-domain-core</artifactId>
         </dependency>
     </dependencies>
 

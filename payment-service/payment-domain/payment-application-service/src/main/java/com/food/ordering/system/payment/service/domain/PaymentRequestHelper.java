@@ -9,9 +9,6 @@ import com.food.ordering.system.payment.service.domain.entity.Payment;
 import com.food.ordering.system.payment.service.domain.event.PaymentEvent;
 import com.food.ordering.system.payment.service.domain.exception.PaymentApplicationServiceException;
 import com.food.ordering.system.payment.service.domain.mapper.PaymentDataMapper;
-import com.food.ordering.system.payment.service.domain.ports.output.message.publisher.PaymentCancelledMessagePublisher;
-import com.food.ordering.system.payment.service.domain.ports.output.message.publisher.PaymentCompletedMessagePublisher;
-import com.food.ordering.system.payment.service.domain.ports.output.message.publisher.PaymentFailedMessagePublisher;
 import com.food.ordering.system.payment.service.domain.ports.output.repository.CreditEntryRepository;
 import com.food.ordering.system.payment.service.domain.ports.output.repository.CreditHistoryRepository;
 import com.food.ordering.system.payment.service.domain.ports.output.repository.PaymentRepository;
@@ -39,29 +36,22 @@ public class PaymentRequestHelper {
 
     private final CreditHistoryRepository creditHistoryRepository;
 
-    private final PaymentCompletedMessagePublisher paymentCompletedMessagePublisher;
-    private final PaymentCancelledMessagePublisher paymentCancelledMessagePublisher;
-    private final PaymentFailedMessagePublisher paymentFailedMessagePublisher;
-
     @Transactional
-    public PaymentEvent persistPayment(PaymentRequest paymentRequest) {
+    public void persistPayment(PaymentRequest paymentRequest) {
         log.info("결제가 생성되었습니다.persistPayment=> orderId: {}", paymentRequest.getOrderId());
         Payment payment = paymentDataMapper.paymentRequestToPayment(paymentRequest);
 
         CreditEntry creditEntry = getCreditEntry(payment.getCustomerId());
         List<CreditHistory> creditHistories = getCreditHistory(payment.getCustomerId());
         PaymentEvent paymentEvent =
-                paymentDomainService.validateAndInitiatePayment(payment, creditEntry, creditHistories, new ArrayList<>(),
-                        paymentCompletedMessagePublisher,
-                        paymentFailedMessagePublisher);
+                paymentDomainService.validateAndInitiatePayment(payment, creditEntry, creditHistories, new ArrayList<>());
 
         persistDbObjects(payment, paymentEvent, creditEntry, creditHistories);
 
-        return paymentEvent;
     }
 
     @Transactional
-    public PaymentEvent persistCancelPayment(PaymentRequest paymentRequest) {
+    public void persistCancelPayment(PaymentRequest paymentRequest) {
         log.info("결제 취소 요청을 받았습니다.persistCancelPayment=> orderId: {}", paymentRequest.getOrderId());
         Payment payment = paymentRepository.findByOrderId(new OrderId(UUID.fromString(paymentRequest.getOrderId())))
                 .orElseThrow(() -> {
@@ -72,13 +62,10 @@ public class PaymentRequestHelper {
         CreditEntry creditEntry = getCreditEntry(payment.getCustomerId());
         List<CreditHistory> creditHistories = getCreditHistory(payment.getCustomerId());
         PaymentEvent paymentEvent =
-                paymentDomainService.validateAndCancelPayment(payment, creditEntry, creditHistories, new ArrayList<>(),
-                        paymentCancelledMessagePublisher,
-                        paymentFailedMessagePublisher);
+                paymentDomainService.validateAndCancelPayment(payment, creditEntry, creditHistories, new ArrayList<>());
 
         persistDbObjects(payment, paymentEvent, creditEntry, creditHistories);
 
-        return paymentEvent;
     }
 
     private void persistDbObjects(Payment payment,
