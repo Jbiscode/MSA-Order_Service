@@ -20,9 +20,7 @@ public class RestaurantDomainServiceImpl implements RestaurantDomainService {
 
     @Override
     public OrderApprovalEvent validateOrder(Restaurant restaurant,
-                                            List<String> failureMessages,
-                                            DomainEventPublisher<OrderApprovedEvent> orderApprovedEventDomainEventPublisher,
-                                            DomainEventPublisher<OrderRejectedEvent> orderRejectedEventDomainEventPublisher) {
+                                            List<String> failureMessages) {
         restaurant.validateOrder(failureMessages);
         log.info("주문 검증이 시작되었습니다. OrderId: {}", restaurant.getOrderDetail().getId().getValue());
 
@@ -32,16 +30,14 @@ public class RestaurantDomainServiceImpl implements RestaurantDomainService {
             return new OrderApprovedEvent(restaurant.getOrderApproval(),
                     restaurant.getId(),
                     new ArrayList<>(),
-                    ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
-                    orderApprovedEventDomainEventPublisher);
+                    ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
         }else{
             log.error("주문 검증에 실패하였습니다. OrderId: {}", restaurant.getOrderDetail().getId().getValue());
             restaurant.constructOrderApproval(OrderApprovalStatus.REJECTED);
             return new OrderRejectedEvent(restaurant.getOrderApproval(),
                     restaurant.getId(),
                     failureMessages,
-                    ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)),
-                    orderRejectedEventDomainEventPublisher);
+                    ZonedDateTime.now(ZoneId.of(ASIA_SEOUL)));
         }
     }
 }
