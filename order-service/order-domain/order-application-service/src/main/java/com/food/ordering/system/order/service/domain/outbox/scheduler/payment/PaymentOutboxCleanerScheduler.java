@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ public class PaymentOutboxCleanerScheduler implements OutboxScheduler {
     private final PaymentOutboxHelper paymentOutboxHelper;
 
     @Override
+    @Transactional
     @Scheduled(cron = "@midnight")
     public void processOutboxMessage() {
         Optional<List<OrderPaymentOutboxMessage>> outboxMessagesResponse =

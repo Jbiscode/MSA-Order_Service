@@ -20,7 +20,7 @@ public class OrderOutboxCleanerScheduler implements OutboxScheduler {
 
     @Override
     @Transactional
-    @Scheduled(cron = "midnight", zone = "Asia/Seoul")
+    @Scheduled(cron = "@midnight", zone = "Asia/Seoul")
     public void processOutboxMessage() {
         orderOutboxHelper.getOrderOutboxMessageByOutboxStatus(OutboxStatus.COMPLETED)
                 .ifPresent(outboxMessages -> {
